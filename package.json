@@ -1,0 +1,8 @@
+{
+  "name": "nexmo-choir",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:benfoxall/nexmo-choir.git",
+  "author": "Ben Foxall <benfoxall@gmail.com>",
+  "license": "MIT"
+}
