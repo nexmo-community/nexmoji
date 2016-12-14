@@ -18,6 +18,42 @@ size()
 window.addEventListener('resize', size)
 
 
+function render(data) {
+
+  d3.packSiblings(data)
+
+  const circle = svg.selectAll('circle').data(data)
+
+  circle
+    .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
+
+  circle
+    .enter()
+      .append('circle')
+      .attr('fill', d => d.color)
+
+      // delay so they bumble about a bit more
+      .style('transition-delay', (d,i) => `${i * .1}s`)
+      .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
+
+
+      .attr('r', 0)
+      .transition()
+      .attr('r', d => d.r * 0.8)
+
+
+}
+
+
+render([])
+
+
+
+
+
+// Test data/events
+
+
 const data = [
   {
     number: '441826464',
@@ -36,45 +72,9 @@ const data = [
   }
 ]
 
-
-
-let circle = svg.selectAll('circle')
-
-function render(data) {
-
-  d3.packSiblings(data)
-
-  circle = svg.selectAll('circle').data(data)
-
-  circle
-    .transition()
-      .attr('cx', d => d.x + w/2)
-      .attr('cy', d => d.y + h/2)
-      .attr('r', d => d.r * 0.8)
-    .delay( (_, i) => i * 150)
-    .duration(1000)
-
-  circle
-    .enter()
-      .append('circle')
-      .attr('cx', d => d.x + w/2)
-      .attr('cy', d => d.y + h/2)
-      .attr('r', () => 0)
-      .attr('fill', d => d.color)
-      .transition()
-      .attr('r', d => d.r * 0.8)
-      .duration(1500)
-
-}
-
-
 render(data)
 
 
-
-
-
-// Test data
 
 setTimeout(() => {
 
