@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Nexmo choir</title>
+    <style media="screen">
+      body {margin:0}
+
+      path {
+        /*stroke: #000;*/
+        fill: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="../d3.min.js"></script>
+    <script type="text/javascript">
+
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    var analyser = audioCtx.createAnalyser()
+
+    analyser.fftSize = 512
+
+    navigator.mediaDevices.getUserMedia({audio: true})
+      .then(stream => audioCtx.createMediaStreamSource(stream).connect(analyser))
+
+
+    const svg = d3.select('body').append('svg')
+
+    const vis = svg.append('path')
+
+    let w, h, s
+
+    function size () {
+      w = window.innerWidth
+      h = window.innerHeight
+      s = Math.min(w,h) / 4
+
+      svg
+        .attr('width', w)
+        .attr('height', h)
+
+      vis.attr('transform', `translate(${w/2}, ${h/2})`)
+    }
+
+    size()
+
+    window.addEventListener('resize', size)
+
+
+    var line = d3.radialLine()
+      .angle( (_,i,all) => i * Math.PI * 2 / (all.length - 1) )
+      .radius( d => (d||0) * s + s)
+
+
+    const bufferLength = analyser.fftSize
+    console.log(bufferLength)
+    const dataArray = new Float32Array(bufferLength)
+
+    console.log("%d bytes a second", 60 * bufferLength * dataArray.BYTES_PER_ELEMENT)
+
+    function draw() {
+      requestAnimationFrame(draw)
+
+      analyser.getFloatTimeDomainData(dataArray)
+
+      vis.attr('d', line(dataArray))
+
+    }
+
+    draw()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Nexmo choir</title>
+    <style media="screen">
+      body {margin:0}
+
+      path {
+
+      }
+    </style>
+  </head>
+  <body>
+    <script src="../d3.min.js"></script>
+    <script type="text/javascript">
+
+
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    var analyser = audioCtx.createAnalyser()
+
+    analyser.fftSize = 512
+
+    navigator.mediaDevices.getUserMedia({audio: true})
+      .then(stream => audioCtx.createMediaStreamSource(stream).connect(analyser))
+
+
+    const svg = d3.select('body').append('svg')
+
+    const g = svg.append('g')
+    //
+    const v1 = g.append('path').attr('fill', '#ff0')
+    const v2 = g.append('path').attr('fill', '#0ff')
+    const v3 = g.append('path').attr('fill', '#f0f')
+    const v4 = g.append('path').attr('fill', '#fff')
+    //
+    var data = ['#f08', '#8f0', '#08f']
+    //
+    let w, h, s
+    //
+    function size () {
+      w = window.innerWidth
+      h = window.innerHeight
+      s = Math.min(w,h) / 4
+
+      svg
+        .attr('width', w)
+        .attr('height', h)
+
+      g.attr('transform', `translate(${w/2}, ${h/2})`)
+    }
+
+    size()
+
+    window.addEventListener('resize', size)
+    //
+    //
+    var line = d3.radialLine()
+      .angle( (d,i,all) => i * Math.PI * 2 / (all.length - 1) + d )
+      .radius( d => (d||0) * s + s)
+    //
+    //
+    const bufferLength = analyser.fftSize
+    const dataArray = new Float32Array(bufferLength)
+
+    const length = bufferLength/4
+    const offset = dataArray.BYTES_PER_ELEMENT*length
+    const a1 = new Float32Array(dataArray.buffer, 0, 4)
+    const a2 = new Float32Array(dataArray.buffer, offset*1, 4)
+    const a3 = new Float32Array(dataArray.buffer, offset*2, 4)
+    const a4 = new Float32Array(dataArray.buffer, offset*3, 4)
+
+    console.log("%d bytes a second", 60 * (4 * 4) * dataArray.BYTES_PER_ELEMENT)
+
+    function draw() {
+      requestAnimationFrame(draw)
+
+      analyser.getFloatTimeDomainData(dataArray)
+
+      v1.attr('d', line(a1))
+      v2.attr('d', line(a2))
+      v3.attr('d', line(a3))
+      v4.attr('d', line(a4))
+
+    }
+
+    draw()
+
+    </script>
+  </body>
+</html>
