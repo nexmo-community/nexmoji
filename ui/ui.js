@@ -41,7 +41,7 @@ function render(data) {
       .attr('fill', d => d.color)
 
       // delay so they bumble about a bit more
-      .style('transition-delay', (d,i) => `${i * .1}s`)
+      .style('transition-delay', (d,i) => `${Math.random()}s`)
       .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
 
 
@@ -119,3 +119,19 @@ setTimeout(() => {
   render(data)
 
 }, 2500)
+
+//
+// for(var i = 0; i < 30; i++ ){
+//
+//   setTimeout(() => {
+//
+//     data.push({
+//       number: '441826465',
+//       color: '#ccc',
+//       r: 40 + Math.random() * 20
+//     })
+//
+//     render(data)
+//
+//   }, Math.random() * 15000)
+// }
