@@ -17,6 +17,14 @@ size()
 
 window.addEventListener('resize', size)
 
+const label =
+  svg.append('text')
+    .attr('x', 15)
+    .attr('y', 15)
+    .attr('dominant-baseline', 'hanging')
+    .text("Text 098876542351 to join in")
+
+
 
 function render(data) {
 
