@@ -4,7 +4,7 @@ const svg = d3.select('body').append('svg')
 
 let w, h
 
-function size () {
+function size ( ) {
   w = window.innerWidth
   h = window.innerHeight
 
@@ -22,8 +22,10 @@ const label =
     .attr('x', 15)
     .attr('y', 15)
     .attr('dominant-baseline', 'hanging')
-    .text("Text 098876542351 to join in")
 
+d3.text('/heading-text', response => {
+  if(response) label.text(response)
+})
 
 
 function render(data) {
@@ -41,7 +43,7 @@ function render(data) {
       .attr('fill', d => d.color)
 
       // delay so they bumble about a bit more
-      .style('transition-delay', (d,i) => `${Math.random()}s`)
+      .style('transition-delay', () => `${Math.random()}s`)
       .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
 
 
