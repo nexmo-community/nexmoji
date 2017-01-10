@@ -1,8 +1,11 @@
 require('dotenv-safe').load()
 
+const server = require('http').createServer()
+const WebSocketServer = require('ws').Server
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+const wsApp = new WebSocketServer({ server: server })
 
 const store = require('./lib/store')
 
@@ -57,5 +60,49 @@ app.get('/answer/:key', (req, res) => {
 })
 
 
+wsApp.on('connection', function connection(ws) {
 
-app.listen(process.env.PORT || 3000)
+  // configure
+  ws.send(JSON.stringify({
+    type: 'configure',
+    TIMEOUT: store.TIMEOUT,
+    RANGE_LIMIT: store.RANGE_LIMIT
+  }))
+
+
+  // backfill
+  store
+    .scan( (key, items) => {
+      ws.send(JSON.stringify({
+        type: 'backfill',
+        key, items
+      }))
+    })
+
+})
+
+// update
+store.listen( (key, item) => {
+  const message = JSON.stringify({
+    type: 'update',
+    key, item
+  })
+  wsApp.clients.forEach(
+    client => client.send(message)
+  )
+})
+
+
+// const r = n =>
+//   Math.random().toString(16).substr(2,n)
+//
+// setInterval(() => {
+//   const k = 'foo-' + r(1)
+//   store.push(k, {value: r(4)})
+// }, 5000)
+
+
+server.on('request', app)
+server.listen(process.env.PORT || 3000,
+  () => { console.log('Listening on ' + server.address().port) }
+)
