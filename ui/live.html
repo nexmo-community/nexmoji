@@ -46,9 +46,7 @@
         }
       }
 
-      ws.onopen = () => {
-        console.log('------ connected')
-      }
+      ws.onopen = () => { console.log('Connected to store') }
 
       function handle(data) {
         switch (data.type) {
@@ -84,6 +82,29 @@
         }
       }
     })()
+
+    </script>
+
+
+    <script src="d3.min.js"></script>
+    <script type="text/javascript">
+      var ul = d3.select('body').append('ul')
+
+      store.listen( () => {
+        var li = ul.selectAll('li').data(
+          Object.keys(store.data)
+        )
+
+        li.enter()
+          .append('li')
+
+        li.exit()
+          .remove()
+
+        li
+          .text(d => d + " -> " +JSON.stringify(store.data[d][0].data.status))
+
+      })
 
     </script>
   </body>
