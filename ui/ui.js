@@ -1,4 +1,4 @@
-/* global d3, window */
+/* global d3, window, store */
 
 const svg = d3.select('body').append('svg')
 
@@ -32,7 +32,7 @@ function render(data) {
 
   d3.packSiblings(data)
 
-  const circle = svg.selectAll('circle').data(data)
+  const circle = svg.selectAll('circle').data(data, d => d.key)
 
   circle
     .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
@@ -43,7 +43,7 @@ function render(data) {
       .attr('fill', d => d.color)
 
       // delay so they bumble about a bit more
-      .style('transition-delay', () => `${Math.random()}s`)
+      // .style('transition-delay', () => `${Math.random()}s`)
       .style('transform', d => `translate(${d.x + w/2}px, ${d.y + h/2}px)`)
 
 
@@ -51,6 +51,11 @@ function render(data) {
       .transition()
       .attr('r', d => d.r * 0.8)
 
+  circle
+    .exit()
+    .transition()
+    .attr('r',0)
+    .remove()
 
 }
 
@@ -59,68 +64,89 @@ render([])
 
 
 
+let data = []
+let props = {}
+
+store.listen( () => {
+
+  data =
+    Object.keys(store.data)
+      .map(key => props[key] || (props[key]
+        = {
+          key: key,
+          color: `hsl(${Math.random() * 360}, 90%, 80%)`,
+          r: Math.random() * 20 + 20
+        }
+      ))
+
+
+  render(data)
+
+
+})
+
 
 
 // Test data/events
-
-
-const data = [
-  {
-    number: '441826464',
-    color: 'aquamarine',
-    r: 50
-  },
-  {
-    number: '441826466',
-    color: '#f08',
-    r: 40
-  },
-  {
-    number: '441826465',
-    color: '#08f',
-    r: 50
-  }
-]
-
-render(data)
-
-
-
-setTimeout(() => {
-
-  data.push({
-    number: '441826465',
-    color: '#80f',
-    r: 40
-  })
-
-  render(data)
-
-}, 500)
-
-setTimeout(() => {
-
-  data.push({
-    number: '441826465',
-    color: '#fc0',
-    r: 40 + Math.random() * 20
-  })
-
-  render(data)
-
-}, 1500)
-
-setTimeout(() => {
-
-  data.push({
-    number: '441826465',
-    color: '#08c',
-    r: 40 + Math.random() * 20
-  })
-
-  render(data)
-
-}, 2500)
+//
+//
+// const data = [
+//   {
+//     number: '441826464',
+//     color: 'aquamarine',
+//     r: 50
+//   },
+//   {
+//     number: '441826466',
+//     color: '#f08',
+//     r: 40
+//   },
+//   {
+//     number: '441826465',
+//     color: '#08f',
+//     r: 50
+//   }
+// ]
+//
+// render(data)
+//
+//
+//
+// setTimeout(() => {
+//
+//   data.push({
+//     number: '441826465',
+//     color: '#80f',
+//     r: 40
+//   })
+//
+//   render(data)
+//
+// }, 500)
+//
+// setTimeout(() => {
+//
+//   data.push({
+//     number: '441826465',
+//     color: '#fc0',
+//     r: 40 + Math.random() * 20
+//   })
+//
+//   render(data)
+//
+// }, 1500)
+//
+// setTimeout(() => {
+//
+//   data.push({
+//     number: '441826465',
+//     color: '#08c',
+//     r: 40 + Math.random() * 20
+//   })
+//
+//   render(data)
+//
+// }, 2500)
 
 //
 // for(var i = 0; i < 30; i++ ){

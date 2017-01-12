@@ -60,24 +60,36 @@ app.get('/answer/:key', (req, res) => {
 })
 
 
+const storeConnections = new WeakSet
+
+
 wsApp.on('connection', function connection(ws) {
 
-  // configure
-  ws.send(JSON.stringify({
-    type: 'configure',
-    TIMEOUT: store.TIMEOUT,
-    RANGE_LIMIT: store.RANGE_LIMIT
-  }))
+  const url = ws.upgradeReq.url
+
+  if(url == '/store') {
+
+    storeConnections.add(ws)
+
+    // configure
+    ws.send(JSON.stringify({
+      type: 'configure',
+      TIMEOUT: store.TIMEOUT,
+      RANGE_LIMIT: store.RANGE_LIMIT
+    }))
+
+    // backfill
+    store
+      .scan( (key, items) => {
+        ws.send(JSON.stringify({
+          type: 'backfill',
+          key, items
+        }))
+      })
 
 
-  // backfill
-  store
-    .scan( (key, items) => {
-      ws.send(JSON.stringify({
-        type: 'backfill',
-        key, items
-      }))
-    })
+  }
+
 
 })
 
@@ -87,9 +99,13 @@ store.listen( (key, item) => {
     type: 'update',
     key, item
   })
-  wsApp.clients.forEach(
-    client => client.send(message)
-  )
+  wsApp.clients
+    .filter(
+      client => storeConnections.has(client)
+    )
+    .forEach(
+      client => client.send(message)
+    )
 })
 
 
