@@ -32,50 +32,27 @@
 
 
     var ws = new WebSocket(location.origin.replace(/^http/, 'ws') + '/sample')
-
     ws.binaryType = 'arraybuffer'
-
-
-    var chunkToWAV = (function(chunkSize){
-
-      var head = atob(
-        'UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQAAAAA='
-      )
-
-      var buffer = new ArrayBuffer(head.length + chunkSize)
-      var view = new DataView(buffer)
-
-      for (var i = 0; i < head.length; i++) {
-        view.setUint8(i, head.charCodeAt(i))
-      }
-
-      var dataArray = new Int16Array(buffer)
-      return function toWAV(chunk) {
-        dataArray.set(new Int16Array(chunk), 22)
-        return buffer
-      }
-
-    })(640)
-
 
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var context = new AudioContext();
 
-    var time = 0
+    var time = 2
+
+    var buffers = []
     ws.onmessage = function(e){
 
-      var wav = chunkToWAV(e.data)
+      var input = new Int16Array(e.data)
+      var buffer = context.createBuffer(1, input.length, 16000)
+      var data = buffer.getChannelData(0)
+      for (var i = 0; i < data.length; i++) {
+        data[i] = input[i] / 32767
+      }
 
-      context.decodeAudioData(wav, function(buffer) {
-        var source = context.createBufferSource()
-
-        source.buffer = buffer
-
-        source.start(time += buffer.duration)
-
-        source.connect(context.destination)
-
-	    })
+      var source = context.createBufferSource()
+      source.buffer = buffer
+      source.connect(context.destination)
+      source.start(time += buffer.duration)
 
     }
 
