@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Nexmoji</title>
+    <meta charset="UTF-8">
+
+    <script src="https://cdn.jsdelivr.net/emojione/2.2.7/lib/js/emojione.min.js"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.7/assets/css/emojione.min.css"/> -->
+
+    <style media="screen">
+      img {height:1em}
+    </style>
+
+
+  </head>
+  <body>
+    <h1><span id="number"></span></h1>
+
+    <style media="screen">
+
+    </style>
+    <script type="text/javascript">
+
+      // convert 0-9 to emoji shortcodes
+      var shortNums = ((lookup) =>
+        (n) => n.toString().replace(/\d/g, d => lookup[d])
+      )([
+        ':zero:', ':one:', ':two:',   ':three:', ':four:',
+        ':five:', ':six:', ':seven:', ':eight:', ':nine:'
+      ])
+
+
+
+      // pull out images of emoji within a string
+      function emojiList(string) {
+
+        var span = document.createElement('span')
+        span.innerHTML = emojione.toImage(string)
+
+        return Array.from(span.querySelectorAll('img'))
+        .map(el => el.src)
+        .filter(src =>
+          src.indexOf(emojione.imagePathPNG) == 0
+        )
+      }
+
+
+
+
+      var headerImages = emojiList(
+        shortNums(':iphone: k051234 56 7 8')
+      )
+
+      headerImages.forEach( src => {
+        var img = new Image()
+        img.src = src
+        number.appendChild(img)
+      })
+
+
+      console.log(
+        emojiList('hello :boom: :bar: foo :one: two: 234')
+      )
+
+
+
+
+
+
+
+
+
+
+      var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
+
+
+
+    </script>
+
+
+  </body>
+</html>
