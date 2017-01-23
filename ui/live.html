@@ -7,28 +7,28 @@
   <body>
     <h1>live</h1>
 
-    <script src="reconnecting-ws.js"></script>
-    <script src="store.js"></script>
+    <!-- <script src="reconnecting-ws.js"></script> -->
+    <!-- <script src="store.js"></script> -->
 
-    <script src="d3.min.js"></script>
+    <!-- <script src="d3.min.js"></script> -->
     <script type="text/javascript">
-      var ul = d3.select('body').append('ul')
-
-      store.listen( () => {
-        var li = ul.selectAll('li').data(
-          Object.keys(store.data)
-        )
-
-        li.enter()
-          .append('li')
-
-        li.exit()
-          .remove()
-
-        li
-          .text(d => d + " -> " +JSON.stringify(store.data[d][0].data.status))
-
-      })
+      // var ul = d3.select('body').append('ul')
+      //
+      // store.listen( () => {
+      //   var li = ul.selectAll('li').data(
+      //     Object.keys(store.data)
+      //   )
+      //
+      //   li.enter()
+      //     .append('li')
+      //
+      //   li.exit()
+      //     .remove()
+      //
+      //   li
+      //     .text(d => d + " -> " +JSON.stringify(store.data[d][0].data.status))
+      //
+      // })
 
 
     var ws = new WebSocket(location.origin.replace(/^http/, 'ws') + '/sample')
@@ -37,7 +37,7 @@
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     var context = new AudioContext();
 
-    var time = 2
+    var time = .2
 
     var buffers = []
     ws.onmessage = function(e){
