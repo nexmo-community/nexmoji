@@ -6,13 +6,42 @@
     <meta charset="UTF-8">
 
     <script src="https://cdn.jsdelivr.net/emojione/2.2.7/lib/js/emojione.min.js"></script>
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/emojione/2.2.7/assets/css/emojione.min.css"/> -->
 
     <style media="screen">
       img {height:1em}
+      ul {
+        list-style: none; padding:0;
+        display: flex;
+      }
+      li {
+        margin-right: .5em;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-end;
+      }
+
+      li img {
+        animation-duration: 1s;
+        animation-name: slidein;
+      }
+
+      @keyframes slidein {
+        from {
+          margin-top: -100%;
+          transform: scale(3) rotate(20deg);
+          opacity: 0;
+        }
+
+        to {
+          margin-top: 0%;
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
     </style>
 
 
+    <script src="d3.min.js"></script>
   </head>
   <body>
     <h1><span id="number"></span></h1>
@@ -30,10 +59,26 @@
         ':five:', ':six:', ':seven:', ':eight:', ':nine:'
       ])
 
+      // given a string of text, this will return a list of images
+      // for each of the emoji in the text
+      var images = (() => {
+        const span = document.createElement('span')
 
+        return text => {
+          span.innerHTML = emojione.toImage(text)
+
+          return Array.from(span.querySelectorAll('img'))
+                  .map(el => el.src)
+                  .filter(src =>
+                    src.indexOf(emojione.imagePathPNG) == 0
+                  )
+        }
+
+
+      })()
 
       // pull out images of emoji within a string
-      function emojiList(string) {
+      function images(string) {
 
         var span = document.createElement('span')
         span.innerHTML = emojione.toImage(string)
@@ -45,11 +90,8 @@
         )
       }
 
-
-
-
-      var headerImages = emojiList(
-        shortNums(':iphone: k051234 56 7 8')
+      var headerImages = images(
+        shortNums(':iphone: k051234 56 7 <imxg src="bad.png"/> 8')
       )
 
       headerImages.forEach( src => {
@@ -59,20 +101,97 @@
       })
 
 
-      console.log(
-        emojiList('hello :boom: :bar: foo :one: two: 234')
-      )
+      // console.log(
+      //   images('hello :boom: :bar: foo :one: two: 234')
+      // )
+
+      // emojione kind of blows for this, from now on - imagine images rather than emoji
+
+      var messages = [
+        // {
+        //   from: '124r4',
+        //   text: 'hello :boom: :bar: foo :one: two: 234',
+        //   time: 12441234522
+        // },
+        //
+        // {
+        //   from: '124r3',
+        //   text: 'hello :boom: :bar: :boom: :one: two: 234',
+        //   time: 12441234534
+        // },
+
+        // {
+        //   from: '124r4',
+        //   text: 'hello :one: :two: :three: :arrow_right:',
+        //   time: 12441234599
+        // }
+      ]
 
 
 
 
+      var phoneList =
+        d3.select('body')
+          .append('ul')
+
+
+      function display() {
+
+        var emojis = messages.reduce(
+          (all, message) =>
+            all.concat(
+              images(message.text)
+                .map((src, i) => ({
+                  from: message.from,
+                  src: src
+                }
+              ))
+            )
+        ,[])
+
+
+        var people = d3.nest()
+          .key(message => message.from)
+          .entries(emojis)
+
+        var li = phoneList.selectAll('li')
+        var img = li.selectAll('img')
+
+        li = li.data(people)
+          .enter()
+            .append('li')
+            .merge(li)
+
+        img = li
+          .selectAll('img')
+          .data(d => d.values)
+          .enter()
+          .append('img')
+          .attr('src', d => d.src)
+          .attr()
+
+      }
+
+
+      function seed() {
+
+        // there is no method to this
+        var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
+
+        messages.push({
+            from: '12-' + Math.random().toString(16).substr(2,1),
+            text:
+            Array.from({length: Math.floor(Math.random()*10) + 4}, _ =>
+              emoji[Math.floor(Math.random()*emoji.length-1)]
+            ).join(' whoop ')
+        })
+        display()
+      }
 
 
 
+      setInterval(seed, 1000)
 
-
-
-      var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
 
 
 
