@@ -40,8 +40,6 @@
       }
     </style>
 
-
-    <script src="d3.min.js"></script>
   </head>
   <body>
     <h1><span id="number"></span></h1>
@@ -101,76 +99,41 @@
       })
 
 
-      // console.log(
-      //   images('hello :boom: :bar: foo :one: two: 234')
-      // )
-
-      // emojione kind of blows for this, from now on - imagine images rather than emoji
-
-      var messages = [
-        // {
-        //   from: '124r4',
-        //   text: 'hello :boom: :bar: foo :one: two: 234',
-        //   time: 12441234522
-        // },
-        //
-        // {
-        //   from: '124r3',
-        //   text: 'hello :boom: :bar: :boom: :one: two: 234',
-        //   time: 12441234534
-        // },
-
-        // {
-        //   from: '124r4',
-        //   text: 'hello :one: :two: :three: :arrow_right:',
-        //   time: 12441234599
-        // }
-      ]
 
 
 
+      var people = document.createElement('ul')
+      document.body.appendChild(people)
 
-      var phoneList =
-        d3.select('body')
-          .append('ul')
+      var process = (message) => {
 
+        // find any emoji within the messages
+        var emoji = images(message.text)
 
-      function display() {
+        if(!emoji.length) return
 
-        var emojis = messages.reduce(
-          (all, message) =>
-            all.concat(
-              images(message.text)
-                .map((src, i) => ({
-                  from: message.from,
-                  src: src
-                }
-              ))
-            )
-        ,[])
+        var match = [].filter.call(people.querySelectorAll('li'),
+          element => element.dataset.from == message.from
+        )
 
+        if(!match.length) {
+          match = document.createElement('li')
+          match.dataset.from = message.from
+          people.appendChild(match)
+        } else {
+          match = match[0]
+        }
 
-        var people = d3.nest()
-          .key(message => message.from)
-          .entries(emojis)
-
-        var li = phoneList.selectAll('li')
-        var img = li.selectAll('img')
-
-        li = li.data(people)
-          .enter()
-            .append('li')
-            .merge(li)
-
-        img = li
-          .selectAll('img')
-          .data(d => d.values)
-          .enter()
-          .append('img')
-          .attr('src', d => d.src)
-          .attr()
+        emoji.forEach( src => {
+          var image = new Image()
+          image.src = src
+          match.appendChild(image)
+        })
 
       }
+
+
+
 
 
       function seed() {
@@ -178,16 +141,15 @@
         // there is no method to this
         var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
 
-        messages.push({
+        process({
             from: '12-' + Math.random().toString(16).substr(2,1),
             text:
             Array.from({length: Math.floor(Math.random()*10) + 4}, _ =>
               emoji[Math.floor(Math.random()*emoji.length-1)]
             ).join(' whoop ')
         })
-        display()
-      }
 
+      }
 
 
       setInterval(seed, 1000)
