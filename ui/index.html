@@ -71,7 +71,9 @@
         const span = document.createElement('span')
 
         return text => {
-          span.innerHTML = emojione.toImage(text)
+          span.innerHTML = emojione.toImage(
+            emojione.toShort(text)
+          )
 
           return Array.from(span.querySelectorAll('img'))
                   .map(el => el.src)
