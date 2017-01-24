@@ -26,10 +26,15 @@ app.get('/sms/:token', (req, res) => {
 
   // TODO
   if(req.params.token == process.env.WEBHOOK_TOKEN) {
-    console.log('webhook match')
 
+    // we trust this
+    broadcast(JSON.stringify(req.query), 'sms')
+
+  } else {
+    console.error('token mismatch')
   }
 
+  res.sendStatus(200)
 })
 
 
@@ -64,16 +69,28 @@ app.get('/answer/:key', (req, res) => {
 })
 
 
-const storeConnections = new WeakSet
+// the type of each connection (for broadcast)
+const connections = new WeakMap
 
 
 wsApp.on('connection', function connection(ws) {
 
   const url = ws.upgradeReq.url
 
-  if(url == '/store') {
+  console.log('incoming! ' + url)
 
-    storeConnections.add(ws)
+  ws.on('message', data => {
+    console.log('message', data)
+    console.log('length:', data.length)
+    // sample.write(data)
+  })
+
+  if(url == '/sms') {
+    connections.set(ws, 'sms')
+  }
+
+  if(url == '/store') {
+    connections.set(ws, 'store')
 
     // configure
     ws.send(JSON.stringify({
@@ -94,7 +111,6 @@ wsApp.on('connection', function connection(ws) {
 
   }
 
-
 })
 
 // update
@@ -103,23 +119,19 @@ store.listen( (key, item) => {
     type: 'update',
     key, item
   })
+  broadcast(message, 'store')
+})
+
+
+function broadcast(message, key) {
   wsApp.clients
     .filter(
-      client => storeConnections.has(client)
+      client => !key || (connections.get(client) == key)
     )
     .forEach(
       client => client.send(message)
     )
-})
-
-
-// const r = n =>
-//   Math.random().toString(16).substr(2,n)
-//
-// setInterval(() => {
-//   const k = 'foo-' + r(1)
-//   store.push(k, {value: r(4)})
-// }, 5000)
+}
 
 
 server.on('request', app)
