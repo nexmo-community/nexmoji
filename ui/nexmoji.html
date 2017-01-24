@@ -27,7 +27,7 @@
       }
 
       li img {
-        animation-duration: 1s;
+        animation-duration: 1.5s;
         animation-name: slidein;
       }
 
@@ -121,11 +121,15 @@
         if(!emoji.length) return
 
         // append them to the relevant item
-        var element = this.getItem(message.from)
-        emoji.forEach( src => {
+        var element = this.getItem(message.msisdn)
+
+        emoji.forEach( (src, i, all) => {
           var image = new Image()
           image.src = src
-          element.appendChild(image)
+          setTimeout(function(){
+            element.appendChild(image)
+          }, i * 3000 / all.length)
+
         })
 
       }
@@ -143,7 +147,7 @@
         var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
 
         list.addMessage({
-            from: '12-' + Math.random().toString(16).substr(2,1),
+            msisdn: '12-' + Math.random().toString(16).substr(2,1),
             text:
             Array.from({length: Math.floor(Math.random()*10) + 4}, _ =>
               emoji[Math.floor(Math.random()*emoji.length-1)]
