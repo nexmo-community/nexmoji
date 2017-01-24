@@ -75,16 +75,18 @@
 
       })()
 
+      fetch('/nexmoji-heading')
+        .then(res => res.text())
+        .then(text => {
+          images(
+            shortNums(text)
+          ).forEach( src => {
+            var img = new Image()
+            img.src = src
+            number.appendChild(img)
+          })
+        })
 
-      var headerImages = images(
-        shortNums(':iphone: k051234 56 7 <imxg src="bad.png"/> 8')
-      )
-
-      headerImages.forEach( src => {
-        var img = new Image()
-        img.src = src
-        number.appendChild(img)
-      })
 
 
 

@@ -16,9 +16,13 @@ app.get('/heading-text', (req, res) =>
   res.send(`Text ${process.env.NUMBER} to join`)
 )
 
-app.get('/sms/:token', (req, res) => {
+app.get('/nexmoji-heading', (req, res) =>
+  res.send(`:calling::heart::heavy_plus_sign::poop::arrow_right: ${process.env.NUMBER.replace('44', 0)}`)
+)
 
-  res.sendStatus(200)
+
+
+app.get('/sms/:token', (req, res) => {
 
   // TODO
   if(req.params.token == process.env.WEBHOOK_TOKEN) {
