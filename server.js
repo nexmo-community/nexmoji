@@ -8,7 +8,7 @@ const app = express()
 const wsApp = new WebSocketServer({ server: server })
 
 // frontend and details
-app.use(express.static('ui'))
+app.use(express.static('static'))
 
 app.get('/heading-text', (req, res) =>
   res.send(`Text ${process.env.NUMBER} to join`)
