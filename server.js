@@ -18,36 +18,27 @@ app.get('/nexmoji-heading', (req, res) =>
   res.send(`:calling::heart::heavy_plus_sign::poop::arrow_right: ${process.env.NUMBER.replace('44', 0)}`)
 )
 
+const keycheck = (req, res, next) => {
+  if(req.params.key != process.env.WEBHOOK_TOKEN)
+    res.sendStatus(401)
+  else
+    next()
+}
 
+app.get('/sms/:key', keycheck, (req, res) => {
 
-app.get('/sms/:token', (req, res) => {
-
-  // TODO
-  if(req.params.token == process.env.WEBHOOK_TOKEN) {
-
-    // we trust this
-    broadcast(JSON.stringify(req.query), 'sms')
-
-  } else {
-    console.error('token mismatch')
-  }
+  broadcast(JSON.stringify(req.query), 'sms')
 
   res.sendStatus(200)
+
 })
 
 
-app.get('/conversations', (req, res) => {
-  store
-    .all()
-    .then(res.send.bind(res))
-})
-
-
-app.post('/event/:key', bodyParser.json(), (req, res) => {
+app.post('/event/:key', keycheck, bodyParser.json(), (req, res) => {
   res.sendStaus(501)
 })
 
-app.get('/answer/:key', (req, res) => {
+app.get('/answer/:key', keycheck, (req, res) => {
 
   const ws_url = process.env.PUBLIC_URL.replace(/^http/, 'ws') + '/socket'
   const event_url = process.env.PUBLIC_URL + '/call/event'
