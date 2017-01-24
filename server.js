@@ -7,8 +7,6 @@ const bodyParser = require('body-parser')
 const app = express()
 const wsApp = new WebSocketServer({ server: server })
 
-const store = require('./lib/store')
-
 // frontend and details
 app.use(express.static('ui'))
 
@@ -46,23 +44,37 @@ app.get('/conversations', (req, res) => {
 
 
 app.post('/event/:key', bodyParser.json(), (req, res) => {
-
-  console.log('TODO: ensure key match - ' + req.params.key)
-
-  const {conversation_uuid, status} = req.body
-
-  store.push(conversation_uuid, {status})
-
-  res.send('ok')
+  res.sendStaus(501)
 })
 
 app.get('/answer/:key', (req, res) => {
+
+  const ws_url = process.env.PUBLIC_URL.replace(/^http/, 'ws') + '/socket'
+  const event_url = process.env.PUBLIC_URL + '/call/event'
+
+  console.log('directing call to ' + ws_url)
 
   res.send([
     {
       action: 'talk',
       voiceName: 'Celine',
-      text: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.'
+      text: 'Lorem ipsum'
+    },
+    {
+      'action': 'connect',
+      'eventUrl': [
+        event_url
+      ],
+      'endpoint': [
+        {
+          'type': 'websocket',
+          'uri': ws_url,
+          'content-type': 'audio/l16;rate=16000',
+          'headers': {
+            'whatever': 'metadata_you_want'
+          }
+        }
+      ]
     }
   ])
 
@@ -82,46 +94,13 @@ wsApp.on('connection', function connection(ws) {
   ws.on('message', data => {
     console.log('message', data)
     console.log('length:', data.length)
-    // sample.write(data)
   })
 
   if(url == '/sms') {
     connections.set(ws, 'sms')
   }
 
-  if(url == '/store') {
-    connections.set(ws, 'store')
-
-    // configure
-    ws.send(JSON.stringify({
-      type: 'configure',
-      TIMEOUT: store.TIMEOUT,
-      RANGE_LIMIT: store.RANGE_LIMIT
-    }))
-
-    // backfill
-    store
-      .scan( (key, items) => {
-        ws.send(JSON.stringify({
-          type: 'backfill',
-          key, items
-        }))
-      })
-
-
-  }
-
 })
-
-// update
-store.listen( (key, item) => {
-  const message = JSON.stringify({
-    type: 'update',
-    key, item
-  })
-  broadcast(message, 'store')
-})
-
 
 function broadcast(message, key) {
   wsApp.clients
