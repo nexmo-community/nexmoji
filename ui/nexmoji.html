@@ -75,18 +75,6 @@
 
       })()
 
-      // pull out images of emoji within a string
-      function images(string) {
-
-        var span = document.createElement('span')
-        span.innerHTML = emojione.toImage(string)
-
-        return Array.from(span.querySelectorAll('img'))
-        .map(el => el.src)
-        .filter(src =>
-          src.indexOf(emojione.imagePathPNG) == 0
-        )
-      }
 
       var headerImages = images(
         shortNums(':iphone: k051234 56 7 <imxg src="bad.png"/> 8')
@@ -101,36 +89,41 @@
 
 
 
+      function MessageList() {
+        this.root = document.createElement('ul')
+        document.body.appendChild(this.root)
 
-      var people = document.createElement('ul')
-      document.body.appendChild(people)
+        this.items = {}
+      }
 
-      var process = (message) => {
+      MessageList.prototype.getItem = function(key) {
 
-        // find any emoji within the messages
-        var emoji = images(message.text)
+        if(this.items[key]) return this.items[key]
 
-        if(!emoji.length) return
-
-        var match = [].filter.call(people.querySelectorAll('li'),
-          element => element.dataset.from == message.from
+        this.root.appendChild(
+          this.items[key] = document.createElement('li')
         )
 
-        if(!match.length) {
-          match = document.createElement('li')
-          match.dataset.from = message.from
-          people.appendChild(match)
-        } else {
-          match = match[0]
-        }
+        return this.items[key]
+      }
 
+      MessageList.prototype.addMessage = function (message) {
+        // find any emoji within the messages
+        var emoji = images(message.text)
+        if(!emoji.length) return
+
+        // append them to the relevant item
+        var element = this.getItem(message.from)
         emoji.forEach( src => {
           var image = new Image()
           image.src = src
-          match.appendChild(image)
+          element.appendChild(image)
         })
 
       }
+
+      var list = new MessageList()
+
 
 
 
@@ -141,7 +134,7 @@
         // there is no method to this
         var emoji = Array.from('😢🌈⭐️🚅😉🍯🏸🥋🏉🌡🚽🚰🎶❤️🙃⛑🌂🕷🐪🐾🐉⭐️🌤🔥☄️🌈❄️🍤🍝🎂🍪🥊⛳️🏸')
 
-        process({
+        list.addMessage({
             from: '12-' + Math.random().toString(16).substr(2,1),
             text:
             Array.from({length: Math.floor(Math.random()*10) + 4}, _ =>
