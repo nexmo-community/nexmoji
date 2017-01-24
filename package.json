@@ -1,8 +1,8 @@
 {
-  "name": "nexmo-choir",
+  "name": "nexmoji",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:benfoxall/nexmo-choir.git",
+  "repository": "git@github.com:benfoxall/nexmoji.git",
   "author": "Ben Foxall <benfoxall@gmail.com>",
   "license": "MIT",
   "dependencies": {
