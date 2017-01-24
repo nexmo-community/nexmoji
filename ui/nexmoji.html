@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
 
     <script src="https://cdn.jsdelivr.net/emojione/2.2.7/lib/js/emojione.min.js"></script>
+    <script src="reconnecting-ws.js"></script>
 
     <style media="screen">
       img {
@@ -20,7 +21,7 @@
         justify-content: center;
       }
       li {
-        margin-right: .5em;
+        margin-right: .75em;
         display: flex;
         flex-direction: column-reverse;
         justify-content: flex-end;
@@ -44,6 +45,7 @@
           opacity: 1;
         }
       }
+
     </style>
 
   </head>
@@ -157,8 +159,35 @@
       }
 
 
-      setInterval(seed, 1000)
+      //setInterval(seed, 1000)
 
+
+      // persist messages between page reloads
+      var messages = JSON.parse(
+        sessionStorage.getItem('messages') || '[]'
+      )
+
+      messages.forEach( message =>
+        list.addMessage( message )
+      )
+
+
+
+
+
+      const host = location.origin.replace(/^http/, 'ws') + '/sms'
+
+      const ws = new ReconnectingWebSocket(host)
+
+      ws.onopen = function() {
+        console.log("⚡️ open")
+      }
+      ws.onmessage = function(event) {
+        var message = JSON.parse(event.data)
+        list.addMessage(message)
+        messages.push(message)
+        sessionStorage.setItem('messages', JSON.stringify(messages))
+      }
 
 
 
