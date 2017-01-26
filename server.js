@@ -111,6 +111,13 @@ const protect = (req, res, next) => {
 }
 
 
+app.post('/demo-01.html', protect, bodyParser.urlencoded({extended:false}), (req, res) => {
+
+  console.log('Run Demo One:', req.body)
+
+  res.redirect('/demo-01.html')
+})
+
 
 
 // the type of each connection (for broadcast)
