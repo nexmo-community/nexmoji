@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style media="screen">
+    body {
+      border-top: 15px solid #ccc;
+      font-family: sans-serif;
+      margin: 0 3em;
+    }
+    input {
+      font-size: 1em;
+    }
+    .ok {
+      border-top-color: #74ff74;
+    }
+    .not-ok {
+      border-top-color: red;
+    }
+    .ok h1:after {
+      content: ' success'
+    }
+    .not-ok h1:after {
+      content: ' failed'
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Auth </h1>
+
+    <form method="post" action="/auth/login">
+      <input type="password" name="password">
+    </form>
+
+    <script type="text/javascript">
+
+      fetch('/auth/status', {credentials: 'same-origin'})
+        .then(res =>
+          document.body.className = res.status == 200 ?
+            'ok' : 'not-ok'
+        )
+
+    </script>
+
+
+
+  </body>
+</html>

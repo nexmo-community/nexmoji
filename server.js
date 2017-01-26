@@ -3,6 +3,7 @@ require('dotenv-safe').load()
 const server = require('http').createServer()
 const WebSocketServer = require('ws').Server
 const express = require('express')
+const session = require('express-session')
 const bodyParser = require('body-parser')
 const app = express()
 const wsApp = new WebSocketServer({ server: server })
@@ -70,6 +71,40 @@ app.get('/answer/:key', keycheck, (req, res) => {
   ])
 
 })
+
+
+
+const sess = {
+  secret: process.env.SESSION_SECRET || 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {}
+}
+
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1)
+  sess.cookie.secure = true
+}
+
+app.use(session(sess))
+
+app.get('/auth/status', (req, res) => {
+  res.sendStatus(req.session.logged_in ? 200 : 401)
+})
+
+app.post('/auth/login', bodyParser.urlencoded(), (req, res) => {
+  req.session.logged_in = req.body.password == process.env.PASSWORD
+  res.redirect('/auth.html')
+})
+
+const requireAuth = (req, res, next) => {
+  if(req.session.logged_in)
+    next()
+  else
+    res.redirect('/auth.html')
+}
+
+
 
 
 // the type of each connection (for broadcast)
