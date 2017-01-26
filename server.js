@@ -111,9 +111,32 @@ const protect = (req, res, next) => {
 }
 
 
+const Nexmo = require('nexmo')
+
+const nexmo = new Nexmo({
+  apiKey: process.env.KEY,
+  apiSecret: process.env.SECRET,
+  applicationId: process.env.APP_ID,
+  privateKey: Buffer.from(process.env.PRIVATE_KEY)
+})
+
 app.post('/demo-01.html', protect, bodyParser.urlencoded({extended:false}), (req, res) => {
 
   console.log('Run Demo One:', req.body)
+
+  const numbers = req.body.numbers.split(',')
+  const message = req.body.message
+
+  numbers.forEach(recipient => {
+    nexmo.message
+      .sendSms(
+        process.env.NUMBER,
+        recipient,
+        message,
+        { type: 'unicode' },
+        (err, c) => console.log(err, c)
+      )
+  })
 
   res.redirect('/demo-01.html')
 })
