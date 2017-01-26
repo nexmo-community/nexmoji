@@ -73,8 +73,14 @@ app.get('/answer/:key', keycheck, (req, res) => {
 })
 
 
+const RedisStore = require('connect-redis')(session)
+const Redis = require('ioredis')
+const redis = new Redis(process.env.REDIS_URL)
 
 const sess = {
+  store: new RedisStore({
+    client: redis
+  }),
   secret: process.env.SESSION_SECRET || 'keyboard cat',
   resave: false,
   saveUninitialized: false,
