@@ -98,12 +98,12 @@ app.get('/auth/status', (req, res) => {
   res.sendStatus(req.session.logged_in ? 200 : 401)
 })
 
-app.post('/auth/login', bodyParser.urlencoded(), (req, res) => {
+app.post('/auth/login', bodyParser.urlencoded({extended:false}), (req, res) => {
   req.session.logged_in = req.body.password == process.env.PASSWORD
   res.redirect('/auth.html')
 })
 
-const requireAuth = (req, res, next) => {
+const protect = (req, res, next) => {
   if(req.session.logged_in)
     next()
   else
