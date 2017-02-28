@@ -143,6 +143,46 @@ app.post('/demo-01.html', protect, bodyParser.urlencoded({extended:false}), (req
 
 
 
+app.post('/demo-02.html', protect, bodyParser.urlencoded({extended:false}), (req, res) => {
+
+  const numbers = req.body.numbers.split(',')
+  const message = req.body.message
+
+  const answer_url = process.env.PUBLIC_URL + '/demo-02.answer.json?message=' + message
+
+  numbers.forEach(recipient => {
+
+    nexmo.calls.create({
+      to: [{
+        type: 'phone',
+        number: recipient
+      }],
+      from: {
+        type: 'phone',
+        number: process.env.NUMBER
+      },
+      answer_url: [answer_url]
+    }, (err, data) => {
+      // FIXME: authorisation issues
+      console.log('Response', err, data)
+    })
+
+  })
+
+  res.redirect('/demo-02.html')
+})
+
+app.get('/demo-02.answer.json', (req, res) => {
+  res.send([
+    {
+      action: 'talk',
+      voiceName: 'Celine',
+      text: req.query.message
+    }
+  ])
+})
+
+
 // the type of each connection (for broadcast)
 const connections = new WeakMap
 

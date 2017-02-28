@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      body {
+        text-align: center;
+        font-family: sans-serif;
+      }
+      textarea, input {
+        font-size: 2em;
+        display: block;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>Demo two: outgoing call</h1>
+
+    <form method="post">
+      <div id="status"></div>
+      <input type="hidden" name="numbers" value="" id="numbers">
+      <textarea name="message"></textarea>
+      <input type="submit" value="Send">
+    </form>
+
+    <script type="text/javascript">
+
+      // messages that were sent to this session
+      var messages = JSON.parse(
+        sessionStorage.getItem('messages') || '[]'
+      )
+
+      // pull out all unique numbers
+      var numbers = new Set(
+        messages.map(m => m.msisdn)
+      )
+
+      var qs = document.querySelector.bind(document)
+
+      qs('#numbers').value = Array.from(numbers).join(',')
+      qs('#status').textContent = `${numbers.size} recipient(s)`
+
+    </script>
+
+  </body>
+</html>
