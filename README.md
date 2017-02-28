@@ -11,6 +11,8 @@ The basic flow is:
 
 This is done by displaying a number on a projector and asking people to text it with lots of emoji. As messages are received, the emoji are pulled out and displayed on screen.
 
+![screenshot](static/screenshot.png)
+
 ## Showing demos
 
 The next step is to load a demo, do this by opening a page **in the same browser tab** as the emoji collector.
